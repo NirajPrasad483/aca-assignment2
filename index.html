@@ -1367,7 +1367,7 @@ body {
   -webkit-appearance: none;
   appearance: none;
   height: 6px;
-  background: linear-gradient(to right, var(--gold) 0%, var(--gold) var(--val,50%), rgba(255,255,255,0.1) var(--val,50%));
+  background: rgba(255,255,255,0.1);
   border-radius: 3px;
   outline: none;
   cursor: pointer;
@@ -2407,9 +2407,17 @@ const QUESTS = {
 };
 
 // ===== STATE =====
-let fitbState = {};    // blank_id -> filled value
-let matchState = {};   // index -> filled desc
-let mcqState = {};     // qIdx -> selected option
+// Per-step saved state — keyed by stepIdx
+// This lets navigation Back/Forward preserve answers
+let allFitbState  = {};  // stepIdx -> { blankId: value }
+let allMatchState = {};  // stepIdx -> { slotIdx: desc }
+let allMcqState   = {};  // stepIdx -> { qi: oi }
+let allExpState   = {};  // stepIdx -> { value, justify, notAttempted }
+
+// Active state aliases (point to the current step's saved object)
+let fitbState  = {};
+let matchState = {};
+let mcqState   = {};
 
 // ===== GATE =====
 function openGate(questId) {
@@ -2454,6 +2462,19 @@ function loadQuest(questId) {
   const q = QUESTS[questId];
   currentStep = 0;
   questionScores = [0, 0, 0, 0];
+  experimentAnswers = {};
+
+  // Reset all per-step saved state
+  allFitbState  = {};
+  allMatchState = {};
+  allMcqState   = {};
+  allExpState   = {};
+  fitbState     = {};
+  matchState    = {};
+  mcqState      = {};
+  experimentValue = null;
+  selectedToken   = null;
+  selectedChip    = null;
 
   document.getElementById('quest-view-title').textContent = q.title;
   document.getElementById('quest-view-sub').textContent = q.sub;
@@ -2475,28 +2496,124 @@ function renderProgressBar(activeStep) {
 }
 
 function renderQuestion(stepIdx) {
-  // Score the PREVIOUS step before moving on (if not first question)
+  // Save current step's state before leaving (going forward OR backward)
+  saveCurrentStepState();
+
+  // Score the PREVIOUS step before moving on (going forward only)
   if (stepIdx > 0 && currentStep === stepIdx - 1) {
     autoScoreCurrentStep();
   }
+
   currentStep = stepIdx;
   renderProgressBar(stepIdx);
   const q = QUESTS[currentQuest];
   const qData = q.questions[stepIdx];
   const body = document.getElementById('quest-body');
 
+  // Restore saved state for this step (if user visited before)
+  fitbState  = allFitbState[stepIdx]  ? {...allFitbState[stepIdx]}  : {};
+  matchState = allMatchState[stepIdx] ? {...allMatchState[stepIdx]} : {};
+  mcqState   = allMcqState[stepIdx]   ? {...allMcqState[stepIdx]}   : {};
+  selectedToken = null;
+  selectedChip  = null;
+
+  // Restore experiment value for this step
+  if (qData.type === 'experiment' && allExpState[stepIdx] !== undefined) {
+    experimentValue = allExpState[stepIdx].value;
+  } else if (qData.type === 'experiment') {
+    experimentValue = null;
+  }
+
   let html = '';
-  if (qData.type === 'mcq') html = renderMCQ(qData, stepIdx);
+  if (qData.type === 'mcq')        html = renderMCQ(qData, stepIdx);
   else if (qData.type === 'experiment') html = renderExperiment(qData, stepIdx);
   else if (qData.type === 'match') html = renderMatch(qData, stepIdx);
-  else if (qData.type === 'fitb') html = renderFITB(qData, stepIdx);
+  else if (qData.type === 'fitb')  html = renderFITB(qData, stepIdx);
 
   body.innerHTML = html;
   body.scrollTop = 0;
 
-  if (qData.type === 'fitb') { fitbState = {}; selectedToken = null; }
-  if (qData.type === 'match') { matchState = {}; selectedChip = null; }
-  if (qData.type === 'mcq') { mcqState = {}; }
+  // Re-apply saved answers visually after DOM is ready
+  restoreVisualState(qData, stepIdx);
+}
+
+function saveCurrentStepState() {
+  const q = QUESTS[currentQuest];
+  if (!q) return;
+  const qData = q.questions[currentStep];
+  if (!qData) return;
+  if (qData.type === 'fitb')       allFitbState[currentStep]  = {...fitbState};
+  if (qData.type === 'match')      allMatchState[currentStep] = {...matchState};
+  if (qData.type === 'mcq')        allMcqState[currentStep]   = {...mcqState};
+  if (qData.type === 'experiment') {
+    const justify = document.getElementById('exp-justify');
+    const slider  = document.getElementById('exp-slider');
+    allExpState[currentStep] = {
+      value: experimentValue,
+      justify: justify ? justify.value : '',
+      sliderVal: slider ? slider.value : null,
+      notAttempted: experimentValue === null
+    };
+  }
+}
+
+function restoreVisualState(qData, stepIdx) {
+  if (qData.type === 'mcq') {
+    // Re-highlight selected MCQ options
+    Object.entries(mcqState).forEach(([qi, oi]) => {
+      document.getElementById(`mcq-${qi}-${oi}`)?.classList.add('selected');
+    });
+  }
+  if (qData.type === 'match') {
+    // Re-fill match slots and mark chips as used
+    Object.entries(matchState).forEach(([idx, desc]) => {
+      const slot = document.getElementById(`ms-${idx}`);
+      if (slot && desc) {
+        slot.textContent = desc;
+        slot.classList.add('filled');
+      }
+      const chipId = `chip-${desc.replace(/\s/g,'_')}`;
+      document.getElementById(chipId)?.classList.add('used');
+    });
+  }
+  if (qData.type === 'fitb') {
+    // Re-fill blanks and mark tokens as used
+    Object.entries(fitbState).forEach(([blankId, tok]) => {
+      const slot = document.getElementById(`slot-${blankId}`);
+      if (slot && tok) {
+        slot.textContent = tok;
+        slot.classList.add('filled');
+      }
+      const safeId = tok.replace(/[^a-zA-Z0-9]/g, '_');
+      document.getElementById(`tok-${safeId}`)?.classList.add('used');
+    });
+  }
+  if (qData.type === 'experiment') {
+    const saved = allExpState[stepIdx];
+    if (saved && !saved.notAttempted && saved.value !== null) {
+      // Restore slider position and display
+      const slider  = document.getElementById('exp-slider');
+      const display = document.getElementById('exp-val-display');
+      const isFloat = (qData.paramStep && qData.paramStep < 1);
+      if (slider) {
+        slider.value = saved.sliderVal ?? saved.value;
+        const pmin = qData.paramMin, pmax = qData.paramMax;
+        const pct  = ((parseFloat(slider.value) - pmin) / (pmax - pmin)) * 100;
+        slider.style.background = `linear-gradient(to right, var(--gold) 0%, var(--gold) ${pct}%, rgba(255,255,255,0.1) ${pct}%)`;
+      }
+      if (display) {
+        display.textContent = isFloat ? parseFloat(saved.value).toFixed(2) : saved.value;
+        display.style.color = '';
+        display.style.fontSize = '';
+      }
+      const justify = document.getElementById('exp-justify');
+      if (justify && saved.justify) justify.value = saved.justify;
+    } else if (saved && saved.justify) {
+      // Restore justification text even if slider wasn't moved
+      const justify = document.getElementById('exp-justify');
+      if (justify) justify.value = saved.justify;
+    }
+  }
 }
 
 function autoScoreCurrentStep() {
@@ -2527,6 +2644,12 @@ function renderMCQ(qData, stepIdx) {
 
 function selectMCQ(qi, oi) {
   const q = QUESTS[currentQuest].questions[currentStep];
+  // If already selected, deselect (toggle off)
+  if (mcqState[qi] === oi) {
+    document.getElementById(`mcq-${qi}-${oi}`)?.classList.remove('selected');
+    delete mcqState[qi];
+    return;
+  }
   // Deselect siblings
   q.items[qi].options.forEach((_, idx) => {
     document.getElementById(`mcq-${qi}-${idx}`)?.classList.remove('selected');
@@ -2551,9 +2674,17 @@ function checkMCQ() { scoreMCQ(); }
 let experimentValue = null;
 
 function renderExperiment(qData, stepIdx) {
-  experimentValue = qData.paramDefault;
+  // experimentValue is already set by renderQuestion (restored from allExpState)
+  // Only reset to null if this step has no saved state
+  if (allExpState[stepIdx] === undefined) {
+    experimentValue = null;
+  }
   const isFloat = (qData.paramStep && qData.paramStep < 1);
   const stepAttr = isFloat ? `step="${qData.paramStep}"` : 'step="1"';
+  // Start slider at midpoint visually but track as null until user moves it
+  const midVal = isFloat
+    ? ((qData.paramMin + qData.paramMax) / 2).toFixed(2)
+    : Math.round((qData.paramMin + qData.paramMax) / 2);
   let html = questionWrap(stepIdx, 'B', qData.label, qData.instruction);
   html += `<div class="experiment-panel">
     <div class="experiment-context">${qData.context}</div>
@@ -2564,11 +2695,12 @@ function renderExperiment(qData, stepIdx) {
         <span class="slider-bound">${qData.paramMin}</span>
         <input type="range" class="param-slider" id="exp-slider"
           min="${qData.paramMin}" max="${qData.paramMax}" ${stepAttr}
-          value="${qData.paramDefault}"
-          oninput="updateExpValue(this.value, ${isFloat})">
+          value="${midVal}"
+          style="--val:50%"
+          oninput="updateExpValue(this.value, ${isFloat}, ${qData.paramMin}, ${qData.paramMax})">
         <span class="slider-bound">${qData.paramMax}</span>
       </div>
-      <div class="slider-value-display" id="exp-val-display">${isFloat ? qData.paramDefault.toFixed(2) : qData.paramDefault}</div>
+      <div class="slider-value-display" id="exp-val-display" style="color:rgba(245,233,200,0.3);font-size:1.2rem">Not yet attempted — move the slider</div>
     </div>
     <div class="experiment-justify">
       <label class="experiment-label">Justify your choice (explain why this value is optimal)</label>
@@ -2579,26 +2711,41 @@ function renderExperiment(qData, stepIdx) {
   return html;
 }
 
-function updateExpValue(val, isFloat) {
+function updateExpValue(val, isFloat, pmin, pmax) {
   experimentValue = isFloat ? parseFloat(val) : parseInt(val);
   const display = document.getElementById('exp-val-display');
-  if (display) display.textContent = isFloat ? parseFloat(val).toFixed(2) : val;
+  const slider = document.getElementById('exp-slider');
+  if (display) {
+    display.textContent = isFloat ? parseFloat(val).toFixed(2) : val;
+    display.style.color = '';
+    display.style.fontSize = '';
+  }
+  // Update CSS custom property for gradient fill
+  if (slider) {
+    const pct = ((parseFloat(val) - pmin) / (pmax - pmin)) * 100;
+    slider.style.setProperty('--val', pct + '%');
+    slider.style.background = `linear-gradient(to right, var(--gold) 0%, var(--gold) ${pct}%, rgba(255,255,255,0.1) ${pct}%)`;
+  }
 }
 
 function scoreExperiment() {
   const qData = QUESTS[currentQuest].questions[currentStep];
-  const slider = document.getElementById('exp-slider');
-  const val = slider ? (qData.paramStep && qData.paramStep < 1 ? parseFloat(slider.value) : parseInt(slider.value)) : qData.paramDefault;
   const justify = document.getElementById('exp-justify');
   const justifyText = justify ? justify.value.trim() : '';
-  // Score: 1 if in range, +1 if justification provided (min 10 chars)
+  // If slider was never touched, experimentValue is null = not attempted
+  if (experimentValue === null) {
+    questionScores[currentStep] = 0;
+    if (!experimentAnswers) experimentAnswers = {};
+    experimentAnswers[currentStep] = { value: null, justify: justifyText, notAttempted: true };
+    return;
+  }
+  const val = experimentValue;
   let score = 0;
   if (val >= qData.correctRange[0] && val <= qData.correctRange[1]) score += 1;
   if (justifyText.length >= 10) score += 1;
   questionScores[currentStep] = score;
-  // Store the value for solutions display
   if (!experimentAnswers) experimentAnswers = {};
-  experimentAnswers[currentStep] = { value: val, justify: justifyText };
+  experimentAnswers[currentStep] = { value: val, justify: justifyText, notAttempted: false };
 }
 
 let experimentAnswers = {};
@@ -2634,9 +2781,19 @@ function selectChip(desc, el) {
 }
 
 function fillSlot(idx) {
-  if (!selectedChip) return;
   const slot = document.getElementById(`ms-${idx}`);
-  // Return previous value to pool if any
+  // If no chip selected and slot is filled, clear it back to pool
+  if (!selectedChip) {
+    if (matchState[idx]) {
+      const oldChip = document.getElementById(`chip-${matchState[idx].replace(/\s/g,'_')}`);
+      if (oldChip) oldChip.classList.remove('used');
+      delete matchState[idx];
+      slot.textContent = 'click to fill';
+      slot.classList.remove('filled');
+    }
+    return;
+  }
+  // Return previous value to pool if slot was already filled
   if (matchState[idx]) {
     const oldChip = document.getElementById(`chip-${matchState[idx].replace(/\s/g,'_')}`);
     if (oldChip) oldChip.classList.remove('used');
@@ -2705,14 +2862,16 @@ function fillBlank(blankId) {
   const slot = document.getElementById(`slot-${blankId}`);
   if (!slot) return;
 
-  // If slot already filled, return its value to pool
+  // If slot already filled
   if (fitbState[blankId]) {
     const oldTok = fitbState[blankId];
     const safeId = oldTok.replace(/[^a-zA-Z0-9]/g, '_');
     document.getElementById(`tok-${safeId}`)?.classList.remove('used');
-    slot.textContent = '';
+    delete fitbState[blankId];
+    slot.innerHTML = '&nbsp;';
     slot.classList.remove('filled');
-    if (!selectedToken) { fitbState[blankId] = null; return; }
+    if (!selectedToken) { return; } // No new token — just cleared
+    // Fall through to fill with selectedToken
   }
 
   if (!selectedToken) return;
@@ -2754,8 +2913,12 @@ function questionFooter(checkFn, stepIdx) {
   const isLast = stepIdx === 3;
   const btnLabel = isLast ? 'Submit Quest ⚓' : 'Next Question →';
   const btnAction = isLast ? 'submitQuest()' : `renderQuestion(${stepIdx+1})`;
+  const backBtn = stepIdx > 0
+    ? `<button class="check-btn" onclick="goBack(${stepIdx})" style="margin-right:auto">← Previous</button>`
+    : '';
   return `</div>
     <div class="question-footer">
+      ${backBtn}
       <span class="feedback-msg" id="feedback-msg"></span>
       <div style="display:flex;gap:12px">
         <button class="next-btn visible" id="next-btn" onclick="${btnAction}">
@@ -2780,7 +2943,8 @@ function showNext() {
 
 // ===== SUBMIT QUEST =====
 function submitQuest() {
-  // Score the final question before submitting
+  // Save state of final question, then score it
+  saveCurrentStepState();
   autoScoreCurrentStep();
 
   const q = QUESTS[currentQuest];
@@ -2953,31 +3117,49 @@ function renderSolutions(sub, q) {
     // ── EXPERIMENT ──
     } else if (qData.type === 'experiment') {
       const expAns   = experimentAnswers[idx];
-      const chosen   = expAns ? expAns.value : 0;
+      const notAttempted = !expAns || expAns.notAttempted;
+      const chosen   = expAns && !expAns.notAttempted ? expAns.value : null;
       const justify  = expAns ? expAns.justify : '';
-      const inRange  = chosen >= qData.correctRange[0] && chosen <= qData.correctRange[1];
+      const inRange  = chosen !== null && chosen >= qData.correctRange[0] && chosen <= qData.correctRange[1];
       const justOk   = justify.trim().length >= 10;
-      html += `<div class="cmp-block ${inRange&&justOk?'cmp-right':'cmp-wrong'}">
-        <div class="cmp-question">${qData.paramLabel} — Hyperparameter Tuning</div>
-        <!-- Param value row -->
-        <div class="cmp-row">
-          <div class="cmp-col yours ${inRange?'col-right':'col-wrong'}">
-            <div class="cmp-col-label">Your Value</div>
-            <div class="cmp-col-val exp-big-val">${inRange?'✓ ':'✗ '}<strong>${typeof chosen==='number'&&chosen%1!==0?chosen.toFixed(2):chosen}</strong></div>
+      if (notAttempted) {
+        html += `<div class="cmp-block cmp-wrong">
+          <div class="cmp-question">${qData.paramLabel} — Hyperparameter Tuning</div>
+          <div class="cmp-row">
+            <div class="cmp-col yours col-wrong">
+              <div class="cmp-col-label">Your Value</div>
+              <div class="cmp-col-val" style="color:#e74c3c;font-style:italic">⚠ Not attempted — slider was not moved</div>
+            </div>
+            <div class="cmp-col correct col-correct">
+              <div class="cmp-col-label">Optimal Range</div>
+              <div class="cmp-col-val exp-big-val">✓ <strong>${qData.correctRange[0]} – ${qData.correctRange[1]}</strong></div>
+            </div>
           </div>
-          <div class="cmp-col correct col-correct">
-            <div class="cmp-col-label">Optimal Range</div>
-            <div class="cmp-col-val exp-big-val">✓ <strong>${qData.correctRange[0]} – ${qData.correctRange[1]}</strong></div>
+          <div class="cmp-explanation">${qData.explanation}</div>
+        </div>`;
+      } else {
+        html += `<div class="cmp-block ${inRange&&justOk?'cmp-right':'cmp-wrong'}">
+          <div class="cmp-question">${qData.paramLabel} — Hyperparameter Tuning</div>
+          <!-- Param value row -->
+          <div class="cmp-row">
+            <div class="cmp-col yours ${inRange?'col-right':'col-wrong'}">
+              <div class="cmp-col-label">Your Value</div>
+              <div class="cmp-col-val exp-big-val">${inRange?'✓ ':'✗ '}<strong>${typeof chosen==='number'&&chosen%1!==0?chosen.toFixed(2):chosen}</strong></div>
+            </div>
+            <div class="cmp-col correct col-correct">
+              <div class="cmp-col-label">Optimal Range</div>
+              <div class="cmp-col-val exp-big-val">✓ <strong>${qData.correctRange[0]} – ${qData.correctRange[1]}</strong></div>
+            </div>
           </div>
-        </div>
-        <!-- Explanation -->
-        <div class="cmp-explanation">${qData.explanation}</div>
-        <!-- Justification row -->
-        ${justify ? `<div class="cmp-justify-row">
-          <div class="cmp-col-label" style="margin-bottom:6px">Your Reasoning ${justOk?'✓':'— too short for credit'}</div>
-          <div class="cmp-justify-text">"${justify.replace(/</g,'&lt;')}"</div>
-        </div>` : '<div class="cmp-justify-row"><span style="opacity:0.45;font-style:italic">No justification provided</span></div>'}
-      </div>`;
+          <!-- Explanation -->
+          <div class="cmp-explanation">${qData.explanation}</div>
+          <!-- Justification row -->
+          ${justify ? `<div class="cmp-justify-row">
+            <div class="cmp-col-label" style="margin-bottom:6px">Your Reasoning ${justOk?'✓':'— too short for credit'}</div>
+            <div class="cmp-justify-text">"${justify.replace(/</g,'&lt;')}"</div>
+          </div>` : '<div class="cmp-justify-row"><span style="opacity:0.45;font-style:italic">No justification provided</span></div>'}
+        </div>`;
+      }
 
     // ── MATCH ──
     } else if (qData.type === 'match') {
@@ -3035,6 +3217,14 @@ function backToMap() {
 function exitQuest() {
   document.getElementById('quest-view').classList.remove('active');
   document.body.style.overflow = '';
+}
+
+function goBack(stepIdx) {
+  // renderQuestion will save current state before switching
+  // Just navigate back — no scoring when going back
+  const prevStep = currentStep; // remember where we are
+  currentStep = stepIdx; // trick: make renderQuestion NOT auto-score
+  renderQuestion(stepIdx - 1);
 }
 
 // ===== MENTOR =====
