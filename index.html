@@ -1518,6 +1518,294 @@ body {
   min-width: 160px;
   line-height: 1.5;
 }
+
+/* ===== GOLD BANNER ===== */
+.gold-banner {
+  position: relative;
+  padding: 32px 28px 28px;
+  border-radius: 12px;
+  text-align: center;
+  overflow: hidden;
+  border: 1px solid rgba(200,149,42,0.4);
+  background: linear-gradient(135deg, rgba(10,18,30,0.95) 0%, rgba(20,12,5,0.95) 100%);
+  box-shadow: 0 0 60px rgba(200,149,42,0.15), inset 0 1px 0 rgba(200,149,42,0.2);
+  animation: banner-enter 0.7s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+@keyframes banner-enter {
+  from { opacity:0; transform: scale(0.85) translateY(-20px); }
+  to   { opacity:1; transform: scale(1) translateY(0); }
+}
+
+/* tier accent colours */
+.gold-banner.tier-s { border-color: #ffd700; box-shadow: 0 0 80px rgba(255,215,0,0.25), inset 0 1px 0 rgba(255,215,0,0.3); }
+.gold-banner.tier-a { border-color: var(--gold-bright); box-shadow: 0 0 60px rgba(200,149,42,0.25); }
+.gold-banner.tier-b { border-color: var(--teal-bright); box-shadow: 0 0 60px rgba(26,171,184,0.2); }
+.gold-banner.tier-c { border-color: rgba(200,149,42,0.4); }
+.gold-banner.tier-d { border-color: rgba(150,150,150,0.3); }
+.gold-banner.tier-f { border-color: rgba(100,100,100,0.3); }
+
+.gold-banner-emoji {
+  font-size: 3.5rem;
+  margin-bottom: 10px;
+  animation: emoji-pop 0.5s 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+
+@keyframes emoji-pop {
+  from { transform: scale(0) rotate(-15deg); }
+  to   { transform: scale(1) rotate(0deg); }
+}
+
+.gold-banner-amount {
+  font-family: 'Cinzel', serif;
+  font-size: 3.2rem;
+  font-weight: 900;
+  color: var(--gold-bright);
+  text-shadow: 0 0 40px rgba(200,149,42,0.6);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.gold-banner-unit {
+  font-size: 1.1rem;
+  opacity: 0.7;
+  font-weight: 400;
+}
+
+.gold-banner-level {
+  font-family: 'Cinzel', serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.45em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  opacity: 0.9;
+}
+
+.gold-banner-quote {
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  font-size: 1.05rem;
+  color: rgba(245,233,200,0.75);
+  line-height: 1.5;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 0 12px;
+}
+
+/* Corner decorations */
+.gold-banner::before,
+.gold-banner::after {
+  content: '✦';
+  position: absolute;
+  font-size: 1rem;
+  color: var(--gold);
+  opacity: 0.25;
+}
+.gold-banner::before { top: 12px; left: 16px; }
+.gold-banner::after  { bottom: 12px; right: 16px; }
+
+/* ===== MENTOR: REASONING ROWS ===== */
+.reason-toggle {
+  background: none;
+  border: 1px solid rgba(200,149,42,0.3);
+  border-radius: 4px;
+  color: var(--gold);
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 2px 6px;
+  margin-left: 6px;
+  transition: all 0.15s;
+  vertical-align: middle;
+}
+.reason-toggle:hover { background: rgba(200,149,42,0.15); border-color: var(--gold); }
+
+.reason-row td { padding: 0 !important; }
+
+.reason-block {
+  margin: 0 16px 12px;
+  padding: 14px 18px;
+  background: rgba(26,171,184,0.06);
+  border-left: 3px solid var(--teal-bright);
+  border-radius: 0 6px 6px 0;
+}
+
+.reason-param {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--teal-light);
+  margin-bottom: 6px;
+}
+
+.reason-param strong { color: var(--gold-bright); }
+
+.reason-text {
+  font-family: 'Crimson Pro', serif;
+  font-size: 0.95rem;
+  color: rgba(245,233,200,0.8);
+  font-style: italic;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+
+/* ===== GATE ERROR ===== */
+.gate-error-msg {
+  background: rgba(231,76,60,0.12);
+  border: 1px solid rgba(231,76,60,0.4);
+  border-radius: 6px;
+  padding: 12px 16px;
+  font-size: 0.88rem;
+  color: #e74c3c;
+  text-align: center;
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+/* ===== ANSWER COMPARISON ===== */
+.sol-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.sol-legend {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.sol-legend-yours,
+.sol-legend-correct {
+  font-family: 'Cinzel', serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  padding: 4px 12px;
+  border-radius: 20px;
+  text-transform: uppercase;
+}
+.sol-legend-yours   { background: rgba(231,76,60,0.15); border: 1px solid rgba(231,76,60,0.3); color: #e98080; }
+.sol-legend-correct { background: rgba(46,204,113,0.15); border: 1px solid rgba(46,204,113,0.3); color: #2ecc71; }
+
+/* Score pill */
+.sol-score-pill {
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 20px;
+  letter-spacing: 0.05em;
+}
+.pill-perfect { background: rgba(46,204,113,0.2); border: 1px solid rgba(46,204,113,0.4); color: #2ecc71; }
+.pill-partial { background: rgba(200,149,42,0.2); border: 1px solid rgba(200,149,42,0.4); color: var(--gold-bright); }
+.pill-zero    { background: rgba(231,76,60,0.15); border: 1px solid rgba(231,76,60,0.3);  color: #e74c3c; }
+
+/* Comparison block — one per sub-question */
+.cmp-block {
+  margin-bottom: 10px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid transparent;
+}
+.cmp-right { border-color: rgba(46,204,113,0.2); background: rgba(46,204,113,0.04); }
+.cmp-wrong { border-color: rgba(231,76,60,0.2);  background: rgba(231,76,60,0.04); }
+
+.cmp-question {
+  padding: 10px 14px 8px;
+  font-size: 0.88rem;
+  color: rgba(245,233,200,0.7);
+  line-height: 1.45;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.cmp-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+
+/* single-col when answer is correct — span full width */
+.cmp-right .cmp-row { grid-template-columns: 1fr; }
+
+.cmp-col {
+  padding: 10px 16px 12px;
+}
+.cmp-col + .cmp-col {
+  border-left: 1px solid rgba(255,255,255,0.06);
+}
+
+.col-right { background: rgba(46,204,113,0.07); }
+.col-wrong { background: rgba(231,76,60,0.07);  }
+.col-correct { background: rgba(46,204,113,0.07); }
+
+.cmp-col-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.58rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+  opacity: 0.55;
+}
+.col-right   .cmp-col-label { color: #2ecc71; opacity: 0.8; }
+.col-wrong   .cmp-col-label { color: #e74c3c; opacity: 0.8; }
+.col-correct .cmp-col-label { color: #2ecc71; opacity: 0.8; }
+
+.cmp-col-val {
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+.col-right   .cmp-col-val { color: #2ecc71; }
+.col-wrong   .cmp-col-val { color: #e98080; }
+.col-correct .cmp-col-val { color: #2ecc71; }
+
+/* monospace values (FITB) */
+.mono-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+}
+
+/* big value for experiment */
+.exp-big-val strong {
+  font-family: 'Cinzel', serif;
+  font-size: 1.25rem;
+}
+
+/* explanation strip below experiment row */
+.cmp-explanation {
+  padding: 10px 16px;
+  font-size: 0.84rem;
+  font-style: italic;
+  color: rgba(245,233,200,0.5);
+  border-top: 1px solid rgba(255,255,255,0.05);
+  line-height: 1.5;
+}
+
+/* justification row */
+.cmp-justify-row {
+  padding: 10px 16px 12px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+.cmp-justify-text {
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  font-size: 0.92rem;
+  color: rgba(245,233,200,0.7);
+  line-height: 1.5;
+}
+
+/* inline code in questions */
+.sol-code-inline {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--teal-light);
+  background: rgba(0,0,0,0.3);
+  padding: 2px 7px;
+  border-radius: 3px;
+}
+
 </style>
 </head>
 <body>
@@ -1693,6 +1981,7 @@ body {
       <label>Crew ID (Roll Number)</label>
       <input type="text" id="input-roll" placeholder="e.g. 22CS1001" autocomplete="off"/>
     </div>
+    <div id="gate-error" class="gate-error-msg" style="display:none"></div>
     <button class="modal-btn" onclick="startQuest()">Set Sail ⚓</button>
   </div>
 </div>
@@ -1721,11 +2010,17 @@ body {
 <!-- ===== RESULTS VIEW ===== -->
 <div id="results-view">
   <div class="results-card">
-    <div class="chest-animation" id="results-chest">💰</div>
-    <h2 class="results-title" id="results-title">Chest Claimed!</h2>
-    <p class="results-sub" id="results-sub">You have plundered the island's secrets</p>
 
-    <div class="score-row">
+    <!-- GOLD BANNER -->
+    <div class="gold-banner" id="gold-banner">
+      <div class="gold-banner-emoji" id="gold-banner-emoji">💰</div>
+      <div class="gold-banner-amount"><span id="gold-banner-val">0</span> <span class="gold-banner-unit">Gold</span></div>
+      <div class="gold-banner-level" id="gold-banner-level">LEGENDARY PIRATE</div>
+      <div class="gold-banner-quote" id="gold-banner-quote">"The seas bow before ye."</div>
+    </div>
+
+    <!-- existing score row -->
+    <div class="score-row" style="margin-top:24px">
       <div class="score-cell">
         <span class="score-val" id="res-score">0</span>
         <span class="score-label">Gold Earned</span>
@@ -1859,7 +2154,7 @@ const QUESTS = {
         paramLabel: 'Rounds per arm (m)',
         paramMin: 1,
         paramMax: 30,
-        paramDefault: 5,
+        paramDefault: 0,
         context: 'You have 8 arms and 200 total pulls. You need to choose m such that exploration ends before too many pulls are wasted, yet every arm gets a fair chance.',
         hint: 'With 8 arms, m × 8 pulls are spent exploring. After that, you exploit. The optimal m balances exploration cost vs accuracy of estimates.',
         correctRange: [3, 15],
@@ -1973,7 +2268,7 @@ const QUESTS = {
         paramMin: 0,
         paramMax: 1,
         paramStep: 0.05,
-        paramDefault: 0.1,
+        paramDefault: 0,
         context: 'You are running epsilon-greedy on a 5-arm bandit for 500 pulls. The true best arm has reward 0.8; the others range from 0.2–0.5. You want to maximise total reward.',
         hint: 'ε=0 → pure greedy (never explores). ε=1 → pure random (never exploits). The sweet spot is usually between 0.05 and 0.3 for stationary bandits.',
         correctRange: [0.05, 0.3],
@@ -2063,8 +2358,23 @@ function startQuest() {
   const name = document.getElementById('input-name').value.trim();
   const roll = document.getElementById('input-roll').value.trim();
   if (!name || !roll) { alert('Please enter both your name and roll number.'); return; }
+
+  // Check for duplicate submission for this quest + roll
+  const alreadySubmitted = submissions.some(
+    s => s.roll.trim().toLowerCase() === roll.toLowerCase() && s.questId === currentQuest
+  );
+  if (alreadySubmitted) {
+    const errEl = document.getElementById('gate-error');
+    if (errEl) {
+      errEl.textContent = '⚓ This roll number has already submitted Quest ' + QUESTS[currentQuest].num + '. Each crew member sails once.';
+      errEl.style.display = 'block';
+    }
+    return;
+  }
+
   studentName = name;
   studentRoll = roll;
+  document.getElementById('gate-error').style.display = 'none';
   closeGate();
   loadQuest(currentQuest);
 }
@@ -2410,6 +2720,8 @@ function submitQuest() {
   const maxScore = 13;
   const gold = Math.round((totalCorrect / maxScore) * 100);
 
+  // Capture experiment answer for Q2 (stepIdx=1)
+  const expAns = experimentAnswers[1] || null;
   const submission = {
     name: studentName,
     roll: studentRoll,
@@ -2417,7 +2729,9 @@ function submitQuest() {
     questId: currentQuest,
     scores: [...questionScores],
     gold,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    q2_param_value: expAns ? expAns.value : null,
+    q2_justification: expAns ? expAns.justify : ''
   };
 
   submissions.push(submission);
@@ -2428,13 +2742,39 @@ function submitQuest() {
 }
 
 function showResults(sub, q) {
-  document.getElementById('results-chest').textContent = sub.gold >= 80 ? '💰' : sub.gold >= 50 ? '🪙' : '📦';
-  document.getElementById('results-title').textContent = sub.gold >= 80 ? 'Treasure Claimed!' : sub.gold >= 50 ? 'Chest Opened!' : 'Meagre Haul';
-  document.getElementById('results-sub').textContent = `${sub.name} — ${sub.roll}`;
+  // Gold banner tiers
+  const tiers = [
+    { min: 90, emoji: '👑', level: 'LEGENDARY CAPTAIN',   quote: '"The seas themselves bow before ye, Admiral of all horizons."' },
+    { min: 75, emoji: '💰', level: 'MASTER BUCCANEER',    quote: '"Yer instincts are sharper than any cutlass on these waters."' },
+    { min: 60, emoji: '🏆', level: 'SEASONED CORSAIR',    quote: '"A fine haul! Ye read the algorithm like a true chart-keeper."' },
+    { min: 45, emoji: '⚓', level: 'DECK HAND',           quote: '"Solid work, sailor. A few more voyages and ye\'ll command a fleet."' },
+    { min: 25, emoji: '🗺️', level: 'CABIN CREW',          quote: '"Ye\'ve found the map, but the treasure still eludes yer grasp."' },
+    { min:  0, emoji: '🏴‍☠️', level: 'MAROONED RECRUIT',  quote: '"Even Davy Jones started somewhere. Back to the books, landlubber."' }
+  ];
+  const tier = tiers.find(t => sub.gold >= t.min) || tiers[tiers.length - 1];
+
+  // Animate gold counter
+  const bannerVal = document.getElementById('gold-banner-val');
+  let count = 0;
+  const target = sub.gold;
+  const step = Math.max(1, Math.floor(target / 40));
+  const ticker = setInterval(() => {
+    count = Math.min(count + step, target);
+    bannerVal.textContent = count;
+    if (count >= target) clearInterval(ticker);
+  }, 30);
+
+  // Set banner content
+  document.getElementById('gold-banner-emoji').textContent = tier.emoji;
+  document.getElementById('gold-banner-level').textContent = tier.level;
+  document.getElementById('gold-banner-quote').textContent = tier.quote;
+  document.getElementById('gold-banner').className = 'gold-banner tier-' + ['s','a','b','c','d','f'][tiers.indexOf(tier)];
+
+  // Legacy score cells
   document.getElementById('res-score').textContent = sub.gold;
   document.getElementById('res-correct').textContent = `${sub.scores.reduce((a,b)=>a+b,0)} pts`;
   document.getElementById('res-quest').textContent = q.num;
-  // Build solutions
+
   renderSolutions(sub, q);
   document.getElementById('results-view').classList.add('active');
 }
@@ -2442,37 +2782,126 @@ function showResults(sub, q) {
 function renderSolutions(sub, q) {
   const container = document.getElementById('solutions-container');
   let html = '<div class="solutions-block">';
-  html += '<h3 class="solutions-heading">📜 The Captain\'s Answer Scroll</h3>';
-  html += '<p class="solutions-subheading">Here lie the correct answers to all four questions:</p>';
+  html += '<div class="sol-header-row">';
+  html += '  <h3 class="solutions-heading">📜 Answer Scroll</h3>';
+  html += '  <div class="sol-legend"><span class="sol-legend-yours">Your Answer</span><span class="sol-legend-correct">Correct Answer</span></div>';
+  html += '</div>';
+  html += '<p class="solutions-subheading">Compare your answers with the correct ones below.</p>';
 
   q.questions.forEach((qData, idx) => {
     const score = sub.scores[idx] ?? 0;
-    html += `<div class="sol-item">`;
-    html += `<div class="sol-q-header"><span class="sol-badge">Q${idx+1}</span><span class="sol-q-label">${qData.label}</span><span class="sol-score">+${score} pts</span></div>`;
 
+    // Compute max score per question type for badge colouring
+    let maxQ = 1;
+    if (qData.type === 'mcq') maxQ = qData.items.length;
+    else if (qData.type === 'experiment') maxQ = 2;
+    else if (qData.type === 'match') maxQ = qData.pairs.length;
+    else if (qData.type === 'fitb') maxQ = Object.keys(qData.blanks).length;
+    const perfect = score >= maxQ;
+    const partial = score > 0 && !perfect;
+
+    html += `<div class="sol-item">`;
+    html += `<div class="sol-q-header">
+      <span class="sol-badge">${idx+1}</span>
+      <span class="sol-q-label">${qData.label}</span>
+      <span class="sol-score-pill ${perfect?'pill-perfect':partial?'pill-partial':'pill-zero'}">${score}/${maxQ}</span>
+    </div>`;
+
+    // ── MCQ ──
     if (qData.type === 'mcq') {
-      qData.items.forEach((item, i) => {
-        const letter = ['A','B','C','D'][item.correct];
-        html += `<div class="sol-row"><span class="sol-q-text">${item.q}</span><span class="sol-answer">${letter}: ${item.options[item.correct]}</span></div>`;
+      qData.items.forEach((item, qi) => {
+        const yourIdx  = mcqState[qi];
+        const corrIdx  = item.correct;
+        const isRight  = yourIdx === corrIdx;
+        const letters  = ['A','B','C','D'];
+        const yourText = yourIdx !== undefined ? `${letters[yourIdx]}: ${item.options[yourIdx]}` : '— not answered';
+        const corrText = `${letters[corrIdx]}: ${item.options[corrIdx]}`;
+        html += `<div class="cmp-block ${isRight?'cmp-right':'cmp-wrong'}">
+          <div class="cmp-question">${item.q}</div>
+          <div class="cmp-row">
+            <div class="cmp-col yours ${isRight?'col-right':'col-wrong'}">
+              <div class="cmp-col-label">Your Answer</div>
+              <div class="cmp-col-val">${isRight?'✓ ':'✗ '}${yourText}</div>
+            </div>
+            ${isRight ? '' : `<div class="cmp-col correct col-correct">
+              <div class="cmp-col-label">Correct Answer</div>
+              <div class="cmp-col-val">✓ ${corrText}</div>
+            </div>`}
+          </div>
+        </div>`;
       });
+
+    // ── EXPERIMENT ──
     } else if (qData.type === 'experiment') {
-      const expAns = experimentAnswers[idx];
-      const chosen = expAns ? expAns.value : qData.paramDefault;
-      const inRange = chosen >= qData.correctRange[0] && chosen <= qData.correctRange[1];
-      html += `<div class="sol-row">`;
-      html += `<span class="sol-q-text">Your chosen ${qData.paramLabel}: <strong style="color:${inRange?'var(--success)':'var(--error)'}">${chosen}</strong> ${inRange ? '✓ Within optimal range' : '✗ Outside optimal range'}</span>`;
-      html += `<span class="sol-answer">Optimal range: ${qData.correctRange[0]} – ${qData.correctRange[1]}<br><em>${qData.explanation}</em></span>`;
-      html += `</div>`;
+      const expAns   = experimentAnswers[idx];
+      const chosen   = expAns ? expAns.value : 0;
+      const justify  = expAns ? expAns.justify : '';
+      const inRange  = chosen >= qData.correctRange[0] && chosen <= qData.correctRange[1];
+      const justOk   = justify.trim().length >= 10;
+      html += `<div class="cmp-block ${inRange&&justOk?'cmp-right':'cmp-wrong'}">
+        <div class="cmp-question">${qData.paramLabel} — Hyperparameter Tuning</div>
+        <!-- Param value row -->
+        <div class="cmp-row">
+          <div class="cmp-col yours ${inRange?'col-right':'col-wrong'}">
+            <div class="cmp-col-label">Your Value</div>
+            <div class="cmp-col-val exp-big-val">${inRange?'✓ ':'✗ '}<strong>${typeof chosen==='number'&&chosen%1!==0?chosen.toFixed(2):chosen}</strong></div>
+          </div>
+          <div class="cmp-col correct col-correct">
+            <div class="cmp-col-label">Optimal Range</div>
+            <div class="cmp-col-val exp-big-val">✓ <strong>${qData.correctRange[0]} – ${qData.correctRange[1]}</strong></div>
+          </div>
+        </div>
+        <!-- Explanation -->
+        <div class="cmp-explanation">${qData.explanation}</div>
+        <!-- Justification row -->
+        ${justify ? `<div class="cmp-justify-row">
+          <div class="cmp-col-label" style="margin-bottom:6px">Your Reasoning ${justOk?'✓':'— too short for credit'}</div>
+          <div class="cmp-justify-text">"${justify.replace(/</g,'&lt;')}"</div>
+        </div>` : '<div class="cmp-justify-row"><span style="opacity:0.45;font-style:italic">No justification provided</span></div>'}
+      </div>`;
+
+    // ── MATCH ──
     } else if (qData.type === 'match') {
-      qData.pairs.forEach(pair => {
-        html += `<div class="sol-row"><span class="sol-code">${pair.code}</span><span class="sol-answer">→ ${pair.desc}</span></div>`;
+      qData.pairs.forEach((pair, i) => {
+        const yours  = matchState[i];
+        const isRight = yours === pair.desc;
+        html += `<div class="cmp-block ${isRight?'cmp-right':'cmp-wrong'}">
+          <div class="cmp-question"><span class="sol-code-inline">${pair.code}</span></div>
+          <div class="cmp-row">
+            <div class="cmp-col yours ${isRight?'col-right':'col-wrong'}">
+              <div class="cmp-col-label">Your Match</div>
+              <div class="cmp-col-val">${isRight?'✓ ':yours?'✗ ':'— '}${yours || 'not matched'}</div>
+            </div>
+            ${isRight ? '' : `<div class="cmp-col correct col-correct">
+              <div class="cmp-col-label">Correct Match</div>
+              <div class="cmp-col-val">✓ ${pair.desc}</div>
+            </div>`}
+          </div>
+        </div>`;
       });
+
+    // ── FITB ──
     } else if (qData.type === 'fitb') {
       Object.entries(qData.blanks).forEach(([id, b]) => {
-        html += `<div class="sol-row"><span class="sol-code">Blank ${id}:</span><span class="sol-answer">${b.answer}</span></div>`;
+        const yours   = fitbState[id];
+        const isRight = yours === b.answer;
+        html += `<div class="cmp-block ${isRight?'cmp-right':'cmp-wrong'}">
+          <div class="cmp-question">Blank <code class="sol-code-inline">${id}</code></div>
+          <div class="cmp-row">
+            <div class="cmp-col yours ${isRight?'col-right':'col-wrong'}">
+              <div class="cmp-col-label">Your Answer</div>
+              <div class="cmp-col-val mono-val">${isRight?'✓ ':yours?'✗ ':'— '}${yours || 'not filled'}</div>
+            </div>
+            ${isRight ? '' : `<div class="cmp-col correct col-correct">
+              <div class="cmp-col-label">Correct Answer</div>
+              <div class="cmp-col-val mono-val">✓ ${b.answer}</div>
+            </div>`}
+          </div>
+        </div>`;
       });
     }
-    html += `</div>`;
+
+    html += '</div>'; // sol-item
   });
 
   html += '</div>';
@@ -2531,29 +2960,54 @@ function renderSubmissions() {
   let html = `<table class="submissions-table">
     <thead><tr>
       <th>Captain</th><th>Crew ID</th><th>Quest</th>
-      <th>Q1</th><th>Q2</th><th>Q3</th><th>Q4</th>
+      <th>Q1</th><th>Q2 ✎</th><th>Q3</th><th>Q4</th>
       <th>Gold</th><th>Time</th>
     </tr></thead><tbody>`;
 
-  [...submissions].reverse().forEach(sub => {
+  [...submissions].reverse().forEach((sub, i) => {
     const time = new Date(sub.timestamp).toLocaleString();
     const tag = sub.questId === 'etc' ? 'tag-etc' : 'tag-eg';
     const label = sub.questId === 'etc' ? 'ETC' : 'EG';
+    const rowId = `reason-row-${i}`;
+    const hasReason = sub.q2_justification && sub.q2_justification.trim().length > 0;
+    const paramLabel = sub.questId === 'etc' ? 'm' : 'ε';
+    const q2Score = sub.scores[1] ?? 0;
+
     html += `<tr>
       <td>${sub.name}</td>
       <td style="font-family:'JetBrains Mono',monospace;font-size:0.8rem">${sub.roll}</td>
       <td><span class="tag ${tag}">${label}</span></td>
       <td>${sub.scores[0] ?? 0}</td>
-      <td>${sub.scores[1] ?? 0}</td>
+      <td>
+        <span>${q2Score}</span>
+        ${hasReason ? `<button class="reason-toggle" onclick="toggleReason('${rowId}')">💬</button>` : '<span style="opacity:0.3;font-size:0.75rem">—</span>'}
+      </td>
       <td>${sub.scores[2] ?? 0}</td>
       <td>${sub.scores[3] ?? 0}</td>
       <td style="color:var(--gold-light);font-family:'Cinzel',serif;font-weight:700">${sub.gold}</td>
       <td style="font-size:0.78rem;color:rgba(245,233,200,0.5)">${time}</td>
     </tr>`;
+
+    if (hasReason) {
+      html += `<tr class="reason-row" id="${rowId}" style="display:none">
+        <td colspan="9">
+          <div class="reason-block">
+            <div class="reason-param">Chose ${paramLabel} = <strong>${sub.q2_param_value ?? '—'}</strong></div>
+            <div class="reason-text">${sub.q2_justification.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+          </div>
+        </td>
+      </tr>`;
+    }
   });
 
   html += `</tbody></table>`;
   container.innerHTML = html;
+}
+
+function toggleReason(rowId) {
+  const row = document.getElementById(rowId);
+  if (!row) return;
+  row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
 }
 
 function exportCSV() {
