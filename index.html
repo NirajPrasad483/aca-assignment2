@@ -1089,8 +1089,8 @@ body {
   display: none;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 40px 20px;
+  justify-content: flex-start;
+  padding: 40px 20px 60px;
   overflow-y: auto;
 }
 
@@ -1520,7 +1520,74 @@ body {
 }
 
 /* ===== GOLD BANNER ===== */
-.gold-banner {
+/* ===== PER-QUESTION CHART ===== */
+.q-chart-wrap {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(200,149,42,0.2);
+  border-radius: 10px;
+  padding: 24px 28px;
+}
+
+.q-chart-heading {
+  font-family: 'Cinzel', serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.4em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+.q-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.q-bar-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  color: var(--cream);
+  min-width: 80px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.q-bar-track {
+  flex: 1;
+  height: 14px;
+  background: rgba(255,255,255,0.07);
+  border-radius: 7px;
+  overflow: hidden;
+  position: relative;
+}
+
+.q-bar-fill {
+  height: 100%;
+  border-radius: 7px;
+  transition: width 1s cubic-bezier(0.22,1,0.36,1);
+  width: 0;
+}
+
+.q-bar-fill.correct   { background: linear-gradient(90deg, #2ecc71, #27ae60); }
+.q-bar-fill.partial   { background: linear-gradient(90deg, var(--gold), var(--gold-light)); }
+.q-bar-fill.zero      { background: rgba(231,76,60,0.5); }
+
+.q-bar-score {
+  font-family: 'Cinzel', serif;
+  font-size: 0.78rem;
+  color: var(--cream);
+  min-width: 36px;
+  text-align: right;
+}
+
+.q-bar-score.correct { color: #2ecc71; }
+.q-bar-score.partial { color: var(--gold-light); }
+.q-bar-score.zero    { color: rgba(231,76,60,0.8); }
+
+/* ===== PER-QUESTION CHART ===== */
+
   position: relative;
   padding: 32px 28px 28px;
   border-radius: 12px;
@@ -2034,6 +2101,9 @@ body {
         <span class="score-label">Quest Complete</span>
       </div>
     </div>
+
+    <!-- PER-QUESTION CHART -->
+    <div id="quest-chart" style="margin-top:28px;text-align:left;width:100%"></div>
 
     <div id="solutions-container" style="margin-top:32px;text-align:left;width:100%"></div>
     <button class="back-map-btn" onclick="backToMap()">Return to Map</button>
@@ -2775,8 +2845,57 @@ function showResults(sub, q) {
   document.getElementById('res-correct').textContent = `${sub.scores.reduce((a,b)=>a+b,0)} pts`;
   document.getElementById('res-quest').textContent = q.num;
 
+  renderQuestChart(sub, q);
   renderSolutions(sub, q);
-  document.getElementById('results-view').classList.add('active');
+  const rv = document.getElementById('results-view');
+  rv.classList.add('active');
+  rv.scrollTop = 0;
+}
+
+function renderQuestChart(sub, q) {
+  const container = document.getElementById('quest-chart');
+
+  // Per-question labels and max scores (must match submitQuest logic)
+  const qMeta = q.questions.map((qData, idx) => {
+    let maxQ = 1;
+    if (qData.type === 'mcq') maxQ = qData.items.length;
+    else if (qData.type === 'experiment') maxQ = 2;
+    else if (qData.type === 'match') maxQ = qData.pairs.length;
+    else if (qData.type === 'fitb') maxQ = Object.keys(qData.blanks).length;
+    const score = sub.scores[idx] ?? 0;
+    const perfect = score >= maxQ;
+    const partial = score > 0 && !perfect;
+    const cls = perfect ? 'correct' : partial ? 'partial' : 'zero';
+    const pct = maxQ > 0 ? Math.round((score / maxQ) * 100) : 0;
+    return { label: qData.label || `Q${idx+1}`, score, maxQ, cls, pct };
+  });
+
+  let html = `<div class="q-chart-wrap">
+    <div class="q-chart-heading">⚔ Performance by Question</div>`;
+
+  qMeta.forEach((m, i) => {
+    html += `
+    <div class="q-bar-row">
+      <div class="q-bar-label" title="${m.label}">Q${i+1}: ${m.label}</div>
+      <div class="q-bar-track">
+        <div class="q-bar-fill ${m.cls}" id="qbar-${i}" style="width:0%"></div>
+      </div>
+      <div class="q-bar-score ${m.cls}">${m.score}/${m.maxQ}</div>
+    </div>`;
+  });
+
+  html += `</div>`;
+  container.innerHTML = html;
+
+  // Animate bars after DOM paint
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      qMeta.forEach((m, i) => {
+        const el = document.getElementById(`qbar-${i}`);
+        if (el) el.style.width = m.pct + '%';
+      });
+    });
+  });
 }
 
 function renderSolutions(sub, q) {
