@@ -1245,6 +1245,8 @@ body {
 
 .tag-etc { background: rgba(26,171,184,0.2); color: var(--teal-light); border: 1px solid rgba(26,171,184,0.3); }
 .tag-eg { background: rgba(200,149,42,0.2); color: var(--gold-light); border: 1px solid rgba(200,149,42,0.3); }
+.tag-ucb { background: rgba(155,89,182,0.2); color: #d6a8f0; border: 1px solid rgba(155,89,182,0.3); }
+.tag-ts { background: rgba(46,204,113,0.2); color: #7eedb0; border: 1px solid rgba(46,204,113,0.3); }
 
 .export-btn {
   padding: 10px 22px;
@@ -1994,39 +1996,43 @@ body {
         </div>
       </div>
 
-      <!-- Quest 3: Locked -->
-      <div class="island-card island-locked">
+      <!-- Quest 3: UCB1 -->
+      <div class="island-card island-unlocked" id="card-ucb">
         <div class="island-visual">
-          <div class="storm-cloud"></div>
+          <div class="island-glow"></div>
           <div class="island-shape">
-            <div class="lock-overlay">
-              <span class="lock-icon">🔒</span>
-            </div>
+            <div style="position:absolute;top:20%;left:30%;font-size:2rem;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5))">🌴</div>
+            <div style="position:absolute;top:30%;left:58%;font-size:1.1rem;opacity:0.8">🔭</div>
+            <div style="position:absolute;bottom:18%;left:25%;font-size:1rem;opacity:0.7">💰</div>
           </div>
+          <div class="island-water"></div>
           <div class="quest-flag">3</div>
         </div>
         <div class="island-info">
           <p class="island-quest-label">Quest III</p>
-          <h3 class="island-name">Shrouded in Fog</h3>
-          <p class="island-desc">These waters are not yet charted</p>
+          <h3 class="island-name">UCB1</h3>
+          <p class="island-desc">Chart the unknown — optimism guides the way</p>
+          <button class="enter-btn" onclick="openGate('ucb')">Enter Island</button>
         </div>
       </div>
 
-      <!-- Quest 4: Locked -->
-      <div class="island-card island-locked">
+      <!-- Quest 4: Thompson Sampling -->
+      <div class="island-card island-unlocked" id="card-ts">
         <div class="island-visual">
-          <div class="storm-cloud"></div>
+          <div class="island-glow"></div>
           <div class="island-shape">
-            <div class="lock-overlay">
-              <span class="lock-icon">🔒</span>
-            </div>
+            <div style="position:absolute;top:18%;left:35%;font-size:2rem;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5))">🌴</div>
+            <div style="position:absolute;top:28%;left:58%;font-size:1.1rem;opacity:0.8">🎲</div>
+            <div style="position:absolute;bottom:18%;right:22%;font-size:1rem;opacity:0.7">⚓</div>
           </div>
+          <div class="island-water"></div>
           <div class="quest-flag">4</div>
         </div>
         <div class="island-info">
           <p class="island-quest-label">Quest IV</p>
-          <h3 class="island-name">Beyond the Storm</h3>
-          <p class="island-desc">Your ship is not ready for these seas</p>
+          <h3 class="island-name">Thompson Sampling</h3>
+          <p class="island-desc">Trust the dice — let belief guide your bets</p>
+          <button class="enter-btn" onclick="openGate('ts')">Enter Island</button>
         </div>
       </div>
 
@@ -2403,6 +2409,382 @@ const QUESTS = {
         tokens: ['self.epsilon', 'self.n_arms', 'self.values', 'self.counts[arm]', 'reward', 'self.counts', 'np.random.random()', 'n']
       }
     ]
+  },
+
+  ucb: {
+    title: 'Quest III',
+    sub: 'UCB1',
+    num: 'III',
+    questions: [
+      {
+        type: 'mcq',
+        label: 'Reasoning Questions — Part 1',
+        instruction: 'Select the best answer for each question',
+        items: [
+          {
+                    "q": "What does the \"U\" in UCB stand for, and what is its core philosophical principle?",
+                    "options": [
+                              "Unbounded, never cap your confidence interval",
+                              "Upper, act as if the world is as good as it plausibly could be",
+                              "Utility, maximise expected utility at every step",
+                              "Uniform, treat all arms equally until you have enough data"
+                    ],
+                    "correct": 1
+          },
+          {
+                    "q": "In the UCB score formula UCB_a(t) = μ̄_a(t) + √(2 log t / N_a(t)), what does N_a(t) represent?",
+                    "options": [
+                              "The index of the current best arm",
+                              "The number of times arm a has been pulled up to round t",
+                              "The total number of rounds so far",
+                              "The number of arms in the bandit"
+                    ],
+                    "correct": 1
+          },
+          {
+                    "q": "What happens to the exploration bonus √(2 log t / N_a(t)) as you pull arm a more and more?",
+                    "options": [
+                              "It stays constant",
+                              "It shrinks toward zero",
+                              "It first grows, then shrinks",
+                              "It grows without bound"
+                    ],
+                    "correct": 1
+          },
+          {
+                    "q": "A key weakness of epsilon-greedy compared to UCB is:",
+                    "options": [
+                              "Epsilon-greedy can never find the best arm",
+                              "Epsilon-greedy explores randomly regardless of how little is known about each arm",
+                              "Epsilon-greedy has higher computational cost",
+                              "Epsilon-greedy requires knowing the true reward means in advance"
+                    ],
+                    "correct": 1
+          },
+          {
+                    "q": "UCB1 achieves which regret bound, and how does it compare to epsilon-greedy?",
+                    "options": [
+                              "O(T^{2/3}), same as epsilon-greedy",
+                              "O(√T), slightly better than epsilon-greedy",
+                              "O(log T), dramatically better than epsilon-greedy's O(T^{2/3})",
+                              "O(T), same as epsilon-greedy"
+                    ],
+                    "correct": 2
+          }
+]
+      },
+      {
+        type: 'mcq',
+        label: 'Reasoning Questions — Part 2',
+        instruction: 'Select the best answer for each question',
+        items: [
+          {
+                    "q": "In the UCB1 regret bound, Δ(a) = μ* − μ(a) is called the gap. What does a small gap mean for regret?",
+                    "options": [
+                              "Regret is higher because it is harder to identify the best arm",
+                              "The algorithm ignores arms with small gaps",
+                              "Regret is unaffected by the gap",
+                              "Regret is lower because arms are easy to distinguish"
+                    ],
+                    "correct": 0
+          },
+          {
+                    "q": "UCB is derived from Hoeffding's inequality. What does the confidence level in UCB guarantee?",
+                    "options": [
+                              "The true mean exceeds the UCB score with probability at most 1/t⁴",
+                              "The true mean is always below the UCB score",
+                              "The sample mean exactly equals the true mean after enough pulls",
+                              "The best arm is always selected after T rounds"
+                    ],
+                    "correct": 0
+          },
+          {
+                    "q": "You are running UCB1 on a 3-arm bandit. After 100 rounds, Arm 1 has been pulled 60 times, Arm 2 has been pulled 30 times, and Arm 3 has been pulled 10 times, all with similar sample means. Which arm will UCB1 most likely select next?",
+                    "options": [
+                              "Arm 2, it is a balanced choice",
+                              "It selects uniformly at random since means are similar",
+                              "Arm 1, it has the most data so the estimate is most reliable",
+                              "Arm 3, it has the largest exploration bonus due to fewest pulls"
+                    ],
+                    "correct": 3
+          },
+          {
+                    "q": "What is the expected number of times a suboptimal arm a with gap Δ(a) is pulled by UCB1 over T rounds?",
+                    "options": [
+                              "O(T)",
+                              "O(Δ(a) · log T)",
+                              "O(√T)",
+                              "O(log T / Δ(a))"
+                    ],
+                    "correct": 3
+          },
+          {
+                    "q": "You have a 2-arm bandit. Arm 1 has been pulled 9 times, Arm 2 has been pulled 1 time. Both have sample mean 0.5. At round t = 11, what are the UCB scores and which arm gets selected? (Use natural log)",
+                    "options": [
+                              "Arm 1; UCB₁ ≈ 0.99, UCB₂ ≈ 0.72",
+                              "Arm 2; UCB₁ ≈ 0.99, UCB₂ ≈ 2.69",
+                              "Arm 1; UCB₁ ≈ 0.99, UCB₂ ≈ 0.74",
+                              "Arm 2; UCB₁ ≈ 0.99, UCB₂ ≈ 1.97"
+                    ],
+                    "correct": 1
+          }
+]
+      },
+      {
+        type: 'match',
+        label: 'Match the Concepts',
+        instruction: 'Select a description chip, then click the matching slot next to each scenario',
+        pairs: [
+          { code: 'Skip round-robin init, pull only Arm 1 from round 1', desc: 'Division by zero in the bonus term & over-exploits Arm 1 before others are explored' },
+          { code: 'All 5 gaps shrink to within 0.05 of each other', desc: 'Regret rises — an inherent O(log T / \u0394) cost, not an algorithm bug' },
+          { code: '\u221a(2 log t / N_a(t)) as N_a(t) keeps growing', desc: 'Exploration bonus shrinks toward zero — self-correcting exploration' },
+          { code: 'P(\u03bc(a) > UCB_a(t)) from Hoeffding', desc: '\u2264 1/t\u2074 — keeps total overconfidence probability finite across all rounds' }
+        ]
+      },
+      {
+        type: 'fitb',
+        label: 'Fill in the Blanks',
+        instruction: 'Select a token below, then click a blank slot to fill it. Click a filled slot to return it to the pool.',
+        skeleton: [
+          { type: 'line', indent: 0, parts: [
+            {t:'kw',v:'def '},{t:'fn',v:'select_arm'},{t:'plain',v:'(self):'}
+          ]},
+          { type: 'line', indent: 1, parts: [
+            {t:'kw',v:'for '},{t:'plain',v:'arm in '},{t:'fn',v:'range'},{t:'plain',v:'(self.n_arms):'}
+          ]},
+          { type: 'line', indent: 2, parts: [
+            {t:'kw',v:'if '},{t:'self',v:'self'},{t:'plain',v:'.counts[arm] == '},{t:'num',v:'0'},{t:'plain',v:':'}
+          ]},
+          { type: 'line', indent: 3, parts: [
+            {t:'kw',v:'return '},{t:'plain',v:'arm'}
+          ]},
+          { type: 'line', indent: 1, parts: [
+            {t:'plain',v:'t = '},{t:'fn',v:'sum'},{t:'plain',v:'(self.counts)'}
+          ]},
+          { type: 'line', indent: 1, parts: [
+            {t:'plain',v:'ucb_values = []'}
+          ]},
+          { type: 'line', indent: 1, parts: [
+            {t:'kw',v:'for '},{t:'plain',v:'arm in '},{t:'fn',v:'range'},{t:'plain',v:'(self.n_arms):'}
+          ]},
+          { type: 'line', indent: 2, parts: [
+            {t:'plain',v:'bonus = math.'},{t:'fn',v:'sqrt'},{t:'plain',v:'('},
+            {t:'blank',id:'b1'},{t:'plain',v:' / self.counts[arm])'}
+          ]},
+          { type: 'line', indent: 2, parts: [
+            {t:'plain',v:'ucb_values.'},{t:'fn',v:'append'},{t:'plain',v:'(self.values[arm] + bonus)'}
+          ]},
+          { type: 'line', indent: 1, parts: [
+            {t:'kw',v:'return '},{t:'fn',v:'int'},{t:'plain',v:'(np.'},{t:'fn',v:'argmax'},
+            {t:'plain',v:'('},{t:'blank',id:'b2'},{t:'plain',v:'))'}
+          ]},
+          { type: 'blank-line' },
+          { type: 'line', indent: 0, parts: [
+            {t:'kw',v:'def '},{t:'fn',v:'update'},{t:'plain',v:'(self, arm, reward):'}
+          ]},
+          { type: 'line', indent: 1, parts: [
+            {t:'self',v:'self'},{t:'plain',v:'.counts[arm] += '},{t:'num',v:'1'}
+          ]},
+          { type: 'line', indent: 1, parts: [
+            {t:'plain',v:'n = '},{t:'blank',id:'b3'}
+          ]},
+          { type: 'line', indent: 1, parts: [
+            {t:'self',v:'self'},{t:'plain',v:'.values[arm] += ('},{t:'blank',id:'b4'},
+            {t:'plain',v:' - '},{t:'self',v:'self'},{t:'plain',v:'.values[arm]) / n'}
+          ]}
+        ],
+        blanks: {
+          b1: { answer: '2 * math.log(t)', width: '150px' },
+          b2: { answer: 'ucb_values', width: '110px' },
+          b3: { answer: 'self.counts[arm]', width: '140px' },
+          b4: { answer: 'reward', width: '80px' }
+        },
+        tokens: ['ucb_values', 'reward', 'self.n_arms', 'self.counts[arm]', 'math.sqrt(t)', '2 * math.log(t)', 'self.values']
+      }
+    ]
+  },
+
+  ts: {
+    title: 'Quest IV',
+    sub: 'Thompson Sampling',
+    num: 'IV',
+    questions: [
+      {
+        type: 'mcq',
+        label: 'Reasoning Questions — Part 1',
+        instruction: 'Select the best answer for each question',
+        items: [
+          {
+                    "q": "Thompson Sampling is described as \"Bayesian in spirit.\" What does this mean in the context of bandits?",
+                    "options": [
+                              "It assumes rewards follow a Gaussian prior",
+                              "It uses Bayes' theorem to compute exact posterior probabilities at each step",
+                              "It maintains a belief distribution over each arm's true reward rate and updates it with evidence",
+                              "It requires knowing the true reward probabilities in advance"
+                    ],
+                    "correct": 2
+          },
+          {
+                    "q": "You initialise Thompson Sampling for a 5-arm Bernoulli bandit. What prior do you assign to each arm, and what does it represent?",
+                    "options": [
+                              "Beta(10, 10), strong prior toward 0.5",
+                              "Beta(1, 1), uniform, every success rate from 0 to 1 is equally likely",
+                              "Beta(0, 0), uninformative",
+                              "Beta(0.5, 0.5), slightly favour the middle"
+                    ],
+                    "correct": 1
+          },
+          {
+                    "q": "The Beta(α, β) distribution has mean α / (α + β). You start with Beta(1, 1) and observe 7 successes and 3 failures from an arm. What is the posterior mean?",
+                    "options": [
+                              "8/12 ≈ 0.667",
+                              "1/2 = 0.50",
+                              "7/10 = 0.70",
+                              "7/11 ≈ 0.636"
+                    ],
+                    "correct": 0
+          },
+          {
+                    "q": "After each pull of arm a, how do you update its Beta(α_a, β_a) parameters?",
+                    "options": [
+                              "α_a += 1 always, β_a += reward",
+                              "α_a += reward, β_a += reward",
+                              "α_a += reward (1 if success), β_a += (1 − reward) (1 if failure)",
+                              "Reset to Beta(1,1) and start over"
+                    ],
+                    "correct": 2
+          },
+          {
+                    "q": "As α + β grows large, what happens to the shape of the Beta distribution?",
+                    "options": [
+                              "It becomes narrower and concentrates around the true success rate",
+                              "It shifts toward 0.5 regardless of the data",
+                              "It becomes flatter and more uncertain",
+                              "It becomes bimodal"
+                    ],
+                    "correct": 0
+          }
+]
+      },
+      {
+        type: 'mcq',
+        label: 'Reasoning Questions — Part 2',
+        instruction: 'Select the best answer for each question',
+        items: [
+          {
+                    "q": "At each round, Thompson Sampling selects an arm by:",
+                    "options": [
+                              "Computing the arm with the highest posterior mean",
+                              "Sampling one value from each arm's posterior distribution and selecting the argmax",
+                              "Randomly selecting arms proportional to their posterior means",
+                              "Computing a deterministic upper confidence bound on the posterior"
+                    ],
+                    "correct": 1
+          },
+          {
+                    "q": "You have pulled Arm 2 fifty times (30 successes, 20 failures), giving posterior Beta(31, 21). A new Arm 4 is added with prior Beta(1,1). Which arm is Thompson Sampling more likely to explore next round?",
+                    "options": [
+                              "Both are equally likely",
+                              "Neither, TS always exploits the current best arm",
+                              "Arm 2",
+                              "Arm 4"
+                    ],
+                    "correct": 3
+          },
+          {
+                    "q": "Thompson Sampling and UCB1 both achieve O(log T) regret. In practice, which statement best describes their empirical difference?",
+                    "options": [
+                              "UCB1 consistently outperforms TS in all settings",
+                              "They perform identically because they have the same regret bound",
+                              "TS tends to achieve lower regret earlier, especially in easy problems",
+                              "TS performs better only when rewards are continuous"
+                    ],
+                    "correct": 2
+          },
+          {
+                    "q": "You run Thompson Sampling on a bandit where Arm 3's true success rate secretly doubles from 0.2 to 0.8 at round 500. What happens?",
+                    "options": [
+                              "TS adapts quickly because posterior sampling is stochastic",
+                              "TS ignores the change entirely",
+                              "TS adapts slowly",
+                              "TS detects the change immediately and pivots to Arm 3"
+                    ],
+                    "correct": 2
+          },
+          {
+                    "q": "After 20 rounds, Arm 1 has posterior Beta(15, 7). What is the posterior mean and variance?",
+                    "options": [
+                              "Mean = 15/20 = 0.75, Variance ≈ 0.0092",
+                              "Mean = 15/21 ≈ 0.714, Variance ≈ 0.0101",
+                              "Mean = 14/22 ≈ 0.636, Variance ≈ 0.011",
+                              "Mean = 15/22 ≈ 0.682, Variance ≈ 0.0094"
+                    ],
+                    "correct": 3
+          }
+]
+      },
+      {
+        type: 'match',
+        label: 'Match the Concepts',
+        instruction: 'Select a description chip, then click the matching slot next to each scenario',
+        pairs: [
+          { code: 'Beta(1, 1) prior on every arm', desc: 'Uniform belief — every success rate from 0 to 1 is equally likely at the start' },
+          { code: 'Beta(10, 10) prior instead of Beta(1, 1)', desc: 'Strong prior resists updating — slows discovery of the true best arm early on' },
+          { code: '\u03b1 + \u03b2 grows large after many pulls', desc: 'Posterior variance shrinks — belief concentrates around the true success rate' },
+          { code: 'TS samples one value per arm each round', desc: 'Stochastic sampling creates automatic exploration with no explicit bonus term' }
+        ]
+      },
+      {
+        type: 'fitb',
+        label: 'Fill in the Blanks',
+        instruction: 'Select a token below, then click a blank slot to fill it. Click a filled slot to return it to the pool.',
+        skeleton: [
+          { type: 'line', indent: 0, parts: [
+            {t:'kw',v:'def '},{t:'fn',v:'select_arm'},{t:'plain',v:'(self):'}
+          ]},
+          { type: 'line', indent: 1, parts: [
+            {t:'plain',v:'samples = ['}
+          ]},
+          { type: 'line', indent: 2, parts: [
+            {t:'plain',v:'np.random.'},{t:'fn',v:'beta'},{t:'plain',v:'('},
+            {t:'blank',id:'b1'},{t:'plain',v:', self.beta[arm])'}
+          ]},
+          { type: 'line', indent: 2, parts: [
+            {t:'kw',v:'for '},{t:'plain',v:'arm in '},{t:'fn',v:'range'},{t:'plain',v:'(self.n_arms)'}
+          ]},
+          { type: 'line', indent: 1, parts: [
+            {t:'plain',v:']'}
+          ]},
+          { type: 'line', indent: 1, parts: [
+            {t:'kw',v:'return '},{t:'fn',v:'int'},{t:'plain',v:'(np.'},{t:'fn',v:'argmax'},
+            {t:'plain',v:'('},{t:'blank',id:'b2'},{t:'plain',v:'))'}
+          ]},
+          { type: 'blank-line' },
+          { type: 'line', indent: 0, parts: [
+            {t:'kw',v:'def '},{t:'fn',v:'update'},{t:'plain',v:'(self, arm, reward):'}
+          ]},
+          { type: 'line', indent: 1, parts: [
+            {t:'kw',v:'if '},{t:'plain',v:'reward == '},{t:'num',v:'1'},{t:'plain',v:':'}
+          ]},
+          { type: 'line', indent: 2, parts: [
+            {t:'self',v:'self'},{t:'plain',v:'.alpha[arm] += '},{t:'blank',id:'b3'}
+          ]},
+          { type: 'line', indent: 1, parts: [
+            {t:'kw',v:'else'},{t:'plain',v:':'}
+          ]},
+          { type: 'line', indent: 2, parts: [
+            {t:'blank',id:'b4'},{t:'plain',v:'[arm] += '},{t:'num',v:'1'}
+          ]}
+        ],
+        blanks: {
+          b1: { answer: 'self.alpha[arm]', width: '120px' },
+          b2: { answer: 'samples', width: '100px' },
+          b3: { answer: '1', width: '50px' },
+          b4: { answer: 'self.beta', width: '100px' }
+        },
+        tokens: ['self.beta', 'samples', 'np.random.uniform()', '1', 'self.alpha[arm]', 'self.n_arms']
+      }
+    ]
   }
 };
 
@@ -2438,15 +2820,20 @@ function startQuest() {
   if (!name || !roll) { alert('Please enter both your name and roll number.'); return; }
 
   // Check for duplicate submission for this quest + roll
-  const alreadySubmitted = submissions.some(
+  const existingSub = submissions.find(
     s => s.roll.trim().toLowerCase() === roll.toLowerCase() && s.questId === currentQuest
   );
-  if (alreadySubmitted) {
-    const errEl = document.getElementById('gate-error');
-    if (errEl) {
-      errEl.textContent = '⚓ This roll number has already submitted Quest ' + QUESTS[currentQuest].num + '. Each crew member sails once.';
-      errEl.style.display = 'block';
-    }
+  if (existingSub) {
+    document.getElementById('gate-error').style.display = 'none';
+    closeGate();
+    currentQuest = currentQuest; // already set
+    allMcqState   = (existingSub.answers && existingSub.answers.mcq)   ? JSON.parse(JSON.stringify(existingSub.answers.mcq))   : {};
+    allMatchState = (existingSub.answers && existingSub.answers.match) ? JSON.parse(JSON.stringify(existingSub.answers.match)) : {};
+    allFitbState  = (existingSub.answers && existingSub.answers.fitb)  ? JSON.parse(JSON.stringify(existingSub.answers.fitb))  : {};
+    experimentAnswers = existingSub.q2_param_value !== null
+      ? { 1: { value: existingSub.q2_param_value, justify: existingSub.q2_justification, notAttempted: false } }
+      : {};
+    showResults(existingSub, QUESTS[currentQuest], true);
     return;
   }
 
@@ -2951,7 +3338,13 @@ function submitQuest() {
   const totalCorrect = questionScores.reduce((a, b) => a + b, 0);
   // Max per question: Q1=2(mcq), Q2=2(experiment), Q3=4(match), Q4=5(fitb) = 13 max
   // Map to gold out of 100
-  const maxScore = 13;
+  const maxScore = q.questions.reduce((sum, qData) => {
+    if (qData.type === 'mcq') return sum + qData.items.length;
+    if (qData.type === 'experiment') return sum + 2;
+    if (qData.type === 'match') return sum + qData.pairs.length;
+    if (qData.type === 'fitb') return sum + Object.keys(qData.blanks).length;
+    return sum;
+  }, 0);
   const gold = Math.round((totalCorrect / maxScore) * 100);
 
   // Capture experiment answer for Q2 (stepIdx=1)
@@ -2959,13 +3352,18 @@ function submitQuest() {
   const submission = {
     name: studentName,
     roll: studentRoll,
-    quest: currentQuest === 'etc' ? 'Explore Then Commit' : 'Epsilon Greedy',
+    quest: q.sub,
     questId: currentQuest,
     scores: [...questionScores],
     gold,
     timestamp: new Date().toISOString(),
     q2_param_value: expAns ? expAns.value : null,
-    q2_justification: expAns ? expAns.justify : ''
+    q2_justification: expAns ? expAns.justify : '',
+    answers: {
+      mcq: JSON.parse(JSON.stringify(allMcqState)),
+      match: JSON.parse(JSON.stringify(allMatchState)),
+      fitb: JSON.parse(JSON.stringify(allFitbState))
+    }
   };
 
   submissions.push(submission);
@@ -2975,7 +3373,7 @@ function submitQuest() {
   showResults(submission, q);
 }
 
-function showResults(sub, q) {
+function showResults(sub, q, viewOnly) {
   // Gold banner tiers
   const tiers = [
     { min: 90, emoji: '👑', level: 'LEGENDARY CAPTAIN',   quote: '"The seas themselves bow before ye, Admiral of all horizons."' },
@@ -3011,6 +3409,16 @@ function showResults(sub, q) {
 
   renderQuestChart(sub, q);
   renderSolutions(sub, q);
+  if (viewOnly) {
+    const container = document.getElementById('solutions-container');
+    container.insertAdjacentHTML('afterbegin',
+      `<div class="solutions-block" style="text-align:center;padding:16px;margin-bottom:20px">
+        <h3 class="solutions-heading">📜 Voyage Already Logged</h3>
+        <p class="solutions-subheading" style="margin-top:6px">
+          Ye have already set sail on this quest, Captain — here is yer logged response sheet.
+        </p>
+      </div>`);
+  }
   const rv = document.getElementById('results-view');
   rv.classList.add('active');
   rv.scrollTop = 0;
@@ -3093,7 +3501,7 @@ function renderSolutions(sub, q) {
     // ── MCQ ──
     if (qData.type === 'mcq') {
       qData.items.forEach((item, qi) => {
-        const yourIdx  = mcqState[qi];
+        const yourIdx  = (allMcqState[idx] || {})[qi];
         const corrIdx  = item.correct;
         const isRight  = yourIdx === corrIdx;
         const letters  = ['A','B','C','D'];
@@ -3164,7 +3572,7 @@ function renderSolutions(sub, q) {
     // ── MATCH ──
     } else if (qData.type === 'match') {
       qData.pairs.forEach((pair, i) => {
-        const yours  = matchState[i];
+        const yours  = (allMatchState[idx] || {})[i];
         const isRight = yours === pair.desc;
         html += `<div class="cmp-block ${isRight?'cmp-right':'cmp-wrong'}">
           <div class="cmp-question"><span class="sol-code-inline">${pair.code}</span></div>
@@ -3184,7 +3592,7 @@ function renderSolutions(sub, q) {
     // ── FITB ──
     } else if (qData.type === 'fitb') {
       Object.entries(qData.blanks).forEach(([id, b]) => {
-        const yours   = fitbState[id];
+        const yours   = (allFitbState[idx] || {})[id];
         const isRight = yours === b.answer;
         html += `<div class="cmp-block ${isRight?'cmp-right':'cmp-wrong'}">
           <div class="cmp-question">Blank <code class="sol-code-inline">${id}</code></div>
@@ -3275,8 +3683,10 @@ function renderSubmissions() {
 
   [...submissions].reverse().forEach((sub, i) => {
     const time = new Date(sub.timestamp).toLocaleString();
-    const tag = sub.questId === 'etc' ? 'tag-etc' : 'tag-eg';
-    const label = sub.questId === 'etc' ? 'ETC' : 'EG';
+    const tagMap = { etc: 'tag-etc', eg: 'tag-eg', ucb: 'tag-ucb', ts: 'tag-ts' };
+    const labelMap = { etc: 'ETC', eg: 'EG', ucb: 'UCB1', ts: 'TS' };
+    const tag = tagMap[sub.questId] || 'tag-etc';
+    const label = labelMap[sub.questId] || sub.questId;
     const rowId = `reason-row-${i}`;
     const hasReason = sub.q2_justification && sub.q2_justification.trim().length > 0;
     const paramLabel = sub.questId === 'etc' ? 'm' : 'ε';
